@@ -1,10 +1,12 @@
 import torch
+import torchvision
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
+from torch.utils.tensorboard import SummaryWriter
 
 
 class CNN(nn.Module):
@@ -36,9 +38,9 @@ batch_size = 64
 num_epochs = 1
 
 # Load Data
-train_dataset = datasets.MNIST(root='dataset/', train=True, transform=transforms.ToTensor(), download=True)
+train_dataset = datasets.MNIST(root='/datasets', train=True, transform=transforms.ToTensor(), download=True)
 train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
-test_dataset = datasets.MNIST(root='dataset/', train=False, transform=transforms.ToTensor(), download=True)
+test_dataset = datasets.MNIST(root='/datasets', train=False, transform=transforms.ToTensor(), download=True)
 test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
 
 # Initialize network
@@ -47,9 +49,11 @@ model = CNN().to(device)
 # Loss and Optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+writer = SummaryWriter(f"runs/MNIST/tryingout_tensorboard")
 
 # Train Network
 
+step = 0
 for epoch in range(num_epochs):
     for batch_idx, (data, targets) in enumerate(train_loader):
         # Get data to cuda if possible
@@ -66,6 +70,9 @@ for epoch in range(num_epochs):
 
         # gradient descent or adam step
         optimizer.step()
+
+        writer.add_scalar("Training Loss", loss, global_step=step)
+        step += 1
 
 # Check accuracy on training & test to see how good our model is
 
