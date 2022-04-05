@@ -61,8 +61,8 @@ for epoch in range(num_epochs):
         targets = targets.to(device=device)
 
         # forward
-        scores = model(data)
-        loss = criterion(scores, targets)
+        prediction = model(data)
+        loss = criterion(prediction, targets)
 
         # backward
         optimizer.zero_grad()
